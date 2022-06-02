@@ -1,0 +1,296 @@
+openapi: 3.0.0
+info:
+  title: Ticket System components definiton
+  version: 0.1
+paths:
+  /dev/null:
+    get:
+      description: 
+      responses:
+        200:
+          description:
+
+components:
+  schemas:
+    # Enums
+    statusType:
+      type: string
+      enum:
+        - OK
+        - WARNING
+        - ERROR
+
+    # Technical components
+    tRequestHeader:
+      required:
+        - timestamp
+      properties:
+        timestamp:
+          type: number
+    tResponseHeader:
+      required:
+        - trId
+      properties:
+        trId:
+          type: string
+    tStatus:
+      properties:
+        code:
+          $ref: '#/components/schemas/statusType'
+        message:
+          type: string
+
+    # Entity components
+    eNFTTicket:
+      type: object
+      description: the mintable and tradeable NFT ticket
+      required:
+        - ticketHash
+      properties:
+        ticketHash:
+          description: Hash of the NFT ticket
+          type: string
+          format: uuid
+        currentOwnerOfTicket:
+          description: The current owner of the NFT ticket  
+          type: string
+        currentPriceOfTicket:
+          description: The current price of the NFT ticket  
+          type: string
+        previousOwnerOfTicket:
+          description: The previous owner of the NFT ticket  
+          type: string
+        previousPriceOfTicket:
+          description: The previous price of the NFT ticket  
+          type: string
+        mintedAt:
+          description: Date of minting 
+          type: string
+        lastTradedAt:
+          description: Date of last modification on the NFT ticket's state
+          type: string
+        ticketNumber:
+          description: The number of the NFT ticket out of the total capacity existing
+          type: number
+        ticketType:
+          description: The number of the NFT ticket out of the total capacity existing
+          type: string
+        eventId:
+          description: Identifier of the event
+          type: string
+          format: uuid
+        eventName:
+          description: Name of the event
+          type: string
+        sellerFeeToPublisher:
+          description: Indicates percentages going to the creator of the NFTTickets of the event 
+          type: string
+        publisherOfTicket:
+          description: The organiser of the event  
+          type: string
+        maximumTicketSellable:
+          description: The ticket pool
+          type: number
+        feeForNetworkMaintainer:
+          description: Fee for network network maintainer
+          type: number
+        ticketImage:
+          description: Image of the NFT ticket 
+          type: string
+        eventImage:
+          description: Image of the event that would be on tickets
+          type: string
+        startDateOfEvent:
+          description: The start date of the event
+          type: string
+        endDateOfEvent:
+          description: The end date of the event
+          type: string
+        locationOfEvent:
+          description: The pyhsical location of the event
+          type: string
+        isOnSecondaryMarket:
+          description: Shows whether has been listed on the secondary market or not
+          type: boolean
+
+        
+    eEvent:
+      type: object
+      description: the event what customers could purchse NFT ticket for
+      required:
+        - eventId
+      properties:
+        eventId:
+          description: Identifier of the event
+          type: string
+          format: uuid
+        eventName:
+          description: Name of the event
+          type: string
+        sellerFeeToPublisher:
+          description: Indicates percentages going to the creator of the NFTTickets of the event 
+          type: string
+        publisherOfTicket:
+          description: The organiser of the event  
+          type: string
+        maximumTicketSellable:
+          description: The ticket pool
+          type: number
+        currentPriceOfTicket:
+          description: The current price of the NFT ticket  
+          type: string
+        feeForNetworkMaintainer:
+          description: The publisher of the NFTTicket being the venue, who gets the seller fee
+          type: number
+        eventImage:
+          description: Image of the event that would be on tickets
+          type: string
+        startDateOfEvent:
+          description: The start date of the event
+          type: string
+        endDateOfEvent:
+          description: The end date of the event
+          type: string
+        locationOfEvent:
+          description: The pyhsical location of the event
+          type: string
+
+    
+    # Message components of eNFTTicket- Requests
+    mReqMintNFTTicket:
+      type: object
+      description: Mints a NFTTicket based on provided parameters
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - ticketHash
+            - eventId
+            - currentOwnerOfTicket
+            - currentPriceOfTicket
+            - ticketType
+            - ticketNumber
+          $ref: '#/components/schemas/eNFTTicket'
+
+    mReqGetNFTTicket:
+      type: object
+      description: returns NFTTicket based on its identifier
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - ticketHash
+          $ref: '#/components/schemas/eNFTTicket'     
+
+    mReqModifyNFTTicket:
+      type: object
+      description: modifies NFTTicket based on the provided parameters
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - ticketHash
+            - currentOwnerOfTicket
+            - currentPriceOfTicket
+            - previousOwnerOfTicket
+            - previousPriceOfTicket
+          $ref: '#/components/schemas/eNFTTicket' 
+
+    mReqRemoveNFTTicket:
+      type: object
+      description: deletes NFTTicket based ont its identifier
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - ticketHash
+          $ref: '#/components/schemas/eNFTTicket'      
+
+    # Message components of NFTTicket - Responses
+    mResStatus:
+      type: object
+      description: General status
+      properties:
+        header:
+          $ref: '#/components/schemas/tResponseHeader'
+        status:
+          $ref: '#/components/schemas/tStatus'
+
+    mResTicket:
+      type: object
+      description: NFTTicket's data
+      properties:
+        header:
+          $ref: '#/components/schemas/tResponseHeader'
+        document:
+          $ref: '#/components/schemas/eNFTTicket'
+
+
+    # Message components of eEvent - Requests
+    mReqCreateEvent:
+      type: object
+      description: Creates and event based on provided parameters
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - eventId
+            - eventName
+            - sellerFeeToPublisher
+            - publisherOfTicket
+            - maximumTicketSellable
+            - feeForNetworkMaintainer
+            - eventImage
+            - startDateOfEvent
+            - endDateOfEvent
+            - locationOfEvent
+          $ref: '#/components/schemas/eEvent'
+
+    mReqGetEvent:
+      type: object
+      description: returns the given event based on its identifier
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - eventId
+          $ref: '#/components/schemas/eEvent'     
+
+    mReqModifyEvent:
+      type: object
+      description: modifies the event based on the provided parameters
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - eventId
+          $ref: '#/components/schemas/eEvent' 
+
+    mReqRemoveEvent:
+      type: object
+      description: deletes event based ont its identifier
+      properties:
+        header:
+          $ref: '#/components/schemas/tRequestHeader'
+        document:
+          required:
+            - eventId
+          $ref: '#/components/schemas/eEvent'      
+
+    mResEvent:
+      type: object
+      description: Event's data
+      properties:
+        header:
+          $ref: '#/components/schemas/tResponseHeader'
+        document:
+          $ref: '#/components/schemas/eEvent'
+
+

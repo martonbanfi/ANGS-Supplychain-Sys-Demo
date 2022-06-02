@@ -1,2 +1,6 @@
 # ignore HLF binaries
 bin/*
+
+# ignore HLF .pem files, these would be created runtime 
+# and be regenerated every time the network runs
+#*.pem
